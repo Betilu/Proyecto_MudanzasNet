@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python manage.py makemigrations:*)",
+      "Bash(ls:*)",
+      "Bash(xargs:*)",
+      "Bash(python manage.py migrate:*)",
+      "Bash(python manage.py runserver:*)",
+      "Bash(python manage.py poblar_configuracion_inicial:*)",
+      "Bash(python manage.py:*)"
+    ]
+  }
+}

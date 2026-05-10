@@ -1,0 +1,51 @@
+# Framework principal
+django==6.0.3
+channels==4.2.0
+daphne==4.1.2
+
+# API REST
+djangorestframework==3.16.0
+django-filter==25.1
+djangorestframework-simplejwt==5.5.0
+
+# Base de datos
+psycopg[binary]==3.2.6
+
+# CORS (para permitir peticiones del frontend React y la app móvil)
+django-cors-headers==4.7.0
+
+# Almacenamiento en la nube (AWS S3 para fotos, PDFs, firmas)
+django-storages[s3]==1.14.4
+boto3==1.36.0
+
+# Generación de PDFs (facturas, actas de inventario)
+reportlab==4.3.0
+weasyprint==63.1
+
+# Procesamiento de imágenes (fotos de inventario, firmas)
+Pillow==11.1.0
+
+# Variables de entorno (seguridad, no hardcodear credenciales)
+python-decouple==3.8
+
+# Correo SendGrid por API HTTP (sin SMTP)
+django-anymail[sendgrid]==12.0
+
+# Inteligencia Artificial (Random Forest)
+scikit-learn==1.6.1
+pandas==2.2.3
+numpy==2.2.3
+joblib==1.4.2
+
+# Documentación automática de la API
+drf-spectacular==0.28.0
+
+# Validación y utilidades
+django-phonenumber-field[phonenumbers]==8.0.0
+
+# Exportación a Excel (reportes)
+openpyxl==3.1.5
+
+# Testing
+pytest-django==4.10.0
+factory-boy==3.3.1

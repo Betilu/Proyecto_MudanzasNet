@@ -1,0 +1,195 @@
+<style>
+.pn{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 16px}
+.pb{font-size:12px;padding:6px 10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;transition:all .15s}
+.pb:hover{border-color:var(--color-border-secondary);color:var(--color-text-primary)}
+.pb.on{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.pp{display:none}.pp.on{display:block}
+.ar{display:flex;gap:8px;align-items:flex-start;margin:0 0 10px;padding:10px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary)}
+.ab{font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--border-radius-md);white-space:nowrap;flex-shrink:0}
+.ac{font-size:13px;color:var(--color-text-primary);line-height:1.6;flex:1}
+.ap{font-size:11px;color:var(--color-text-tertiary);display:block;margin-top:2px}
+.bc{background:#E6F1FB;color:#0C447C}
+.bs{background:#EEEDFE;color:#3C3489}
+.bo{background:#FAEEDA;color:#633806}
+.ba{background:#FAECE7;color:#712B13}
+.bd{background:#E1F5EE;color:#085041}
+.tr{font-size:12px;color:var(--color-text-info);margin:12px 0;padding:10px 14px;background:var(--color-background-info);border-radius:var(--border-radius-md);line-height:1.6}
+.tr b{font-weight:500}
+.pt{font-size:16px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px}
+.pd{font-size:13px;color:var(--color-text-secondary);margin:0 0 14px}
+.dw{text-align:center;color:var(--color-text-tertiary);font-size:16px;margin:4px 0}
+.lg{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 16px;padding:10px 12px;border-radius:var(--border-radius-md);background:var(--color-background-secondary)}
+.li{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--color-text-secondary)}
+.ld{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.fb{display:flex;justify-content:space-between;margin-top:16px;align-items:center}
+.fc{font-size:13px;color:var(--color-text-secondary)}
+@media(prefers-color-scheme:dark){.bc{background:#042C53;color:#B5D4F4}.bs{background:#26215C;color:#CECBF6}.bo{background:#412402;color:#FAC775}.ba{background:#4A1B0C;color:#F5C4B3}.bd{background:#04342C;color:#9FE1CB}}
+</style>
+<div class="lg">
+<div class="li"><div class="ld" style="background:#378ADD"></div>Cliente</div>
+<div class="li"><div class="ld" style="background:#7F77DD"></div>Sistema / IA</div>
+<div class="li"><div class="ld" style="background:#BA7517"></div>Operador</div>
+<div class="li"><div class="ld" style="background:#D85A30"></div>Administrador</div>
+<div class="li"><div class="ld" style="background:#1D9E75"></div>Conductor</div>
+</div>
+<div class="pn" id="nav"></div>
+<div id="panels"></div>
+<div class="fb">
+<button id="pbtn" onclick="mv(-1)">Anterior</button>
+<span class="fc" id="cnt"></span>
+<button id="nbtn" onclick="mv(1)">Siguiente</button>
+</div>
+<script>
+const P=[
+{t:"Fase 1 — Configuracion inicial del sistema",d:"El administrador prepara toda la infraestructura operativa antes de que el sistema reciba clientes",
+s:[
+{a:"ba",l:"Administrador",p:"Portal web",x:"Inicia sesion como superusuario (creado con manage.py createsuperuser). Accede al modulo de Roles y Permisos. Crea los 5 roles base del sistema: administrador, operador, cliente, conductor y cargador."},
+{a:"ba",l:"Administrador",p:"Portal web",x:"Asigna permisos granulares a cada rol. Al operador le asigna: ver_clientes, gestionar_clientes, crear_cotizacion, gestionar_reservas, ver_reservas, ver_pagos, atender_escalaciones. Al conductor: ver_inventario, ver_reservas, actualizar_estado_servicio, registrar_incidencias, confirmar_entrega. Al cargador: ver_inventario, registrar_incidencias. El administrador conserva todos los permisos."},
+{a:"ba",l:"Administrador",p:"Portal web",x:"Registra las zonas geograficas de Santa Cruz: Centro, Equipetrol, Plan 3000, Urbari, Hamacas, Villa 1ero de Mayo, Pampa de la Isla, Los Lotes, Santos Dumont, Radial 26, Banzer, Las Palmas, Norte Integrado, Warnes. Configura las tarifas base entre pares de zonas con distancia en km."},
+{a:"ba",l:"Administrador",p:"Portal web",x:"Configura los tipos de servicio: Basico (solo transporte, factor 1.0x), Estandar (transporte + embalaje, factor 1.5x), Premium (embalaje + transporte + montaje/desmontaje, factor 2.0x). Registra los servicios adicionales: embalaje de muebles (Bs 50/objeto), desembalaje (Bs 200 fijo), proteccion especial (Bs 30/objeto), montaje (Bs 40/objeto), desmontaje (Bs 40/objeto), limpieza de origen (Bs 150 fijo)."},
+{a:"ba",l:"Administrador",p:"Portal web",x:"Registra los vehiculos de la flota: ingresa placa, marca, modelo, anio, color, foto y asigna el tipo de contenedor (pequeno 8m3, mediano 15m3, grande 25m3, extra grande 40m3). Cada vehiculo queda en estado DISPONIBLE."},
+{a:"ba",l:"Administrador",p:"Portal web",x:"Crea las cuentas de los operadores: email, nombre, apellido, telefono, contrasena temporal y rol 'operador'. Crea las cuentas de los conductores y cargadores: ademas de los datos de usuario, ingresa numero de licencia, tipo de licencia, fecha de ingreso y salario. El sistema crea el registro en la tabla usuarios y en la tabla personal en una sola transaccion."},
+{a:"ba",l:"Administrador",p:"Portal web",x:"Configura los parametros del sistema: porcentaje de deposito = 10%, horas para cancelacion gratuita = 48, IVA = 13%, vigencia de cotizacion = 7 dias, horario de atencion = 8:00 a 21:00, km maximos de cobertura = 50. Carga las FAQs iniciales del chatbot: preguntas sobre precios, zonas de cobertura, tipos de servicio, politicas de cancelacion."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Almacena toda la configuracion en las tablas base: roles, permisos, rol_permisos, zonas, tarifas_distancia, tipos_servicio, servicios_adicionales, vehiculos, tipos_contenedor, categorias_objeto, usuarios, personal, metodos_pago, configuracion_sistema, faqs. Cada accion queda registrada en la bitacora de auditoria."},
+],
+tr:"El sistema esta completamente configurado y listo para recibir clientes. Los operadores, conductores y cargadores ya tienen sus cuentas creadas y pueden iniciar sesion desde la web o sus apps moviles respectivamente."},
+
+{t:"Fase 2 — Cotizacion del cliente",d:"El cliente solicita un presupuesto para su mudanza registrando todos sus objetos",
+s:[
+{a:"bc",l:"Cliente",p:"App movil o portal web",x:"Se registra con email y contrasena. El sistema crea su cuenta con rol 'cliente' y perfil vinculado con tipo_cliente 'residencial' por defecto. Inicia sesion y accede a su dashboard."},
+{a:"bc",l:"Cliente",p:"App movil o portal web",x:"Inicia una cotizacion nueva. Selecciona zona de origen: Equipetrol. Ingresa direccion de origen. Selecciona zona de destino: Plan 3000. Ingresa direccion de destino. Selecciona fecha deseada: sabado 28 de marzo. Selecciona franja horaria: manana (8-12h). Elige tipo de servicio: Estandar (transporte + embalaje)."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Consulta la tarifa entre Equipetrol y Plan 3000 en la tabla tarifas_distancia. Resultado: distancia 18 km, tarifa base Bs 800. Crea la cotizacion en estado BORRADOR con los datos ingresados."},
+{a:"bc",l:"Cliente",p:"App movil (camara) o web",x:"Registra su inventario de objetos. Desde la app selecciona del catalogo visual por categorias: Electrodomesticos: 1 refrigerador LG (precargado: 70x70x170cm, 80kg, fragilidad alta), 1 TV 55 pulgadas (precargado: 130x20x80cm, 15kg, fragilidad alta). Muebles: 1 sofa 3 cuerpos (200x90x85cm, 45kg, fragilidad media), 1 mesa de comedor (150x90x75cm, 35kg, fragilidad media). Cajas: 5 cajas grandes (60x40x40cm, 15kg cada una, fragilidad baja). Toma foto de cada objeto desde la camara del celular."},
+{a:"bs",l:"Random Forest",p:"Backend Django",x:"Por cada objeto registrado, ejecuta el modelo RF de clasificacion de riesgo. Features: peso, fragilidad, dimensiones, categoria, volumen. Resultados: Refrigerador LG = riesgo ALTO (prob. dano 0.72, proteccion: embalaje especial). TV 55'' = riesgo ALTO (prob. dano 0.68, proteccion: caja reforzada + burbuja). Sofa = riesgo MEDIO (prob. dano 0.35, proteccion: estandar). Mesa = riesgo MEDIO (prob. dano 0.31, proteccion: estandar). 5 Cajas = riesgo BAJO (prob. dano 0.08, proteccion: estandar). Almacena rf_nivel_riesgo, rf_probabilidad_dano y rf_proteccion_sugerida en cada objeto."},
+{a:"bc",l:"Cliente",p:"App movil o web",x:"Ve los indicadores de riesgo en colores junto a cada objeto: refrigerador y TV con badge ROJO (alto), sofa y mesa con badge AMARILLO (medio), cajas con badge VERDE (bajo). El sistema muestra un banner: 'Recomendamos proteccion especial para el refrigerador y la TV. Costo adicional: Bs 30 por objeto.' El cliente acepta y agrega proteccion especial para ambos (Bs 60 total)."},
+{a:"bc",l:"Cliente",p:"App movil o web",x:"Pulsa el boton Calcular Precio para obtener el presupuesto."},
+{a:"bs",l:"Random Forest",p:"Backend Django",x:"Ejecuta el modelo RF de prediccion de precio. Features de entrada: zona_origen = Equipetrol, zona_destino = Plan 3000, volumen_total = 2.16 m3, peso_total = 250 kg, cantidad_objetos = 8, tipo_servicio = estandar, mes = marzo, dia_semana = sabado. Calculo por formula: tarifa base Bs 800 x factor estandar 1.5 = Bs 1,200 + proteccion especial Bs 60 = Bs 1,260. Prediccion RF: Bs 1,450 (los sabados tienen 15% mas demanda historicamente). Almacena ambos valores: precio_total_calculado = 1,260 y rf_precio_predicho = 1,450."},
+{a:"bc",l:"Cliente",p:"App movil o web",x:"Ve el desglose de costos: tarifa base Bs 800, factor servicio estandar x1.5 = Bs 1,200, proteccion especial 2 objetos = Bs 60, total = Bs 1,260. La cotizacion queda guardada en estado BORRADOR esperando la revision del operador."},
+],
+tr:"La cotizacion queda en estado BORRADOR con todo el inventario registrado, clasificacion de riesgo por objeto, fotos y dos precios calculados (formula e IA). El operador la recibe en su bandeja para revisar y definir el precio final."},
+
+{t:"Fase 3 — Revision y envio del precio",d:"El operador revisa la cotizacion, decide el precio final y lo envia al cliente",
+s:[
+{a:"bo",l:"Operador",p:"Portal web",x:"Inicia sesion en el portal web. Su dashboard muestra: 3 cotizaciones pendientes de revision, 2 reservas confirmadas sin servicio asignado, 1 escalacion de chatbot pendiente, 4 alertas de clientes para hoy. Entra al modulo de cotizaciones y abre la cotizacion del cliente."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Revisa el detalle completo: inventario de 8 objetos con fotos, clasificacion de riesgo por objeto (2 altos, 2 medios, 4 bajos), servicios adicionales vinculados (proteccion especial x2). Ve el desglose de precios: calculado por formula = Bs 1,260, predicho por IA = Bs 1,450."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Decide usar el precio predicho por IA (Bs 1,450) porque es sabado y la demanda historica es alta. Podria ajustar manualmente pero el precio de IA le parece justo. Actualiza el precio total de la cotizacion a Bs 1,450."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Pulsa el boton Enviar Cotizacion al Cliente."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Cambia el estado de la cotizacion de BORRADOR a ENVIADA. Calcula la fecha de vencimiento: hoy + 7 dias (segun configuracion_sistema.dias_vigencia_cotizacion). Crea una notificacion para el cliente con tipo 'cotizacion_enviada'. Registra la accion en la bitacora de auditoria."},
+{a:"bc",l:"Cliente",p:"App movil (push) o web",x:"Recibe la notificacion: 'Tu cotizacion esta lista. Precio: Bs 1,450 para mudanza Equipetrol a Plan 3000, sabado 28 de marzo. Valida hasta el 31 de marzo.' Abre la cotizacion desde la app y revisa todo el desglose."},
+{a:"bc",l:"Cliente",p:"App movil o web",x:"El cliente esta conforme con el precio. Pulsa el boton Aceptar Cotizacion."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Cambia el estado de la cotizacion de ENVIADA a ACEPTADA. Genera automaticamente una reserva vinculada con codigo de confirmacion unico: MUD-A7K3F2. La reserva se crea en estado PENDIENTE (requiere pago de deposito). Fecha de servicio: sabado 28 de marzo, franja: manana 8-12h. Envia notificacion al cliente con el codigo de confirmacion. Envia notificacion al operador informando que la cotizacion fue aceptada."},
+],
+tr:"La cotizacion esta ACEPTADA y la reserva fue generada automaticamente en estado PENDIENTE con codigo MUD-A7K3F2. El cliente debe pagar el deposito del 10% (Bs 145) para confirmar la reserva. Hasta que no pague, la reserva no se activa."},
+
+{t:"Fase 4 — Pago del deposito y confirmacion",d:"El cliente paga el deposito, el operador verifica y la reserva se confirma oficialmente",
+s:[
+{a:"bc",l:"Cliente",p:"App movil o web",x:"Abre su reserva y ve el estado PENDIENTE. El sistema indica: 'Para confirmar tu reserva debes pagar el deposito de Bs 145 (10% de Bs 1,450). Metodos disponibles: transferencia bancaria a cuentas BCP, BNB o Mercantil, o pago en efectivo en nuestras oficinas.' Se muestran los datos bancarios de la empresa: Banco BCP, Cuenta N° 1234567890, a nombre de Mudanzas CRM S.R.L."},
+{a:"bc",l:"Cliente",p:"App de banca movil (externo)",x:"El cliente abre su aplicacion de banca movil BCP, realiza una transferencia de Bs 145 a la cuenta de la empresa. Obtiene el comprobante de la transferencia con numero de referencia."},
+{a:"bc",l:"Cliente",p:"App movil (camara)",x:"Vuelve a la app de mudanzas. Pulsa 'Subir comprobante de pago'. Toma foto del comprobante de transferencia desde la camara del celular o lo selecciona de la galeria. El sistema crea un registro de pago con tipo 'deposito', monto Bs 145, metodo 'transferencia_bcp', estado PENDIENTE y el archivo del comprobante adjunto."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Registra el pago en la tabla pagos con estado PENDIENTE. Envia notificacion al operador: 'Nuevo comprobante de pago recibido para reserva MUD-A7K3F2. Monto: Bs 145. Metodo: transferencia BCP. Pendiente de verificacion.'"},
+{a:"bo",l:"Operador",p:"Portal web",x:"Ve en su bandeja de pagos el nuevo pago pendiente de verificacion. Abre el detalle: ve el comprobante subido por el cliente (foto de la transferencia), verifica que el monto sea correcto (Bs 145), que la fecha de la transferencia sea reciente y que el numero de referencia sea valido."},
+{a:"bo",l:"Operador",p:"Portal web",x:"El comprobante es valido. Pulsa 'Confirmar Pago'. Opcionalmente ingresa la referencia de transaccion del banco para registro."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Cambia el estado del pago de PENDIENTE a COMPLETADO con fecha_pago = ahora. Automaticamente cambia el estado de la reserva de PENDIENTE a CONFIRMADA con confirmada_en = ahora. Genera factura del deposito: numero FAC-2026-0001, subtotal Bs 128.32, IVA 13% = Bs 16.68, total Bs 145.00. Genera el PDF de la factura y lo almacena en el servidor."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Envia notificacion push al cliente: 'Tu reserva MUD-A7K3F2 esta CONFIRMADA. Fecha: sabado 28 de marzo, 8:00-12:00h. Mudanza de Equipetrol a Plan 3000. Puedes descargar tu factura desde la app.' Registra todo en la bitacora de auditoria."},
+{a:"bc",l:"Cliente",p:"App movil (push)",x:"Recibe la notificacion de confirmacion. Abre la app y ve su reserva con estado CONFIRMADA en verde, con la fecha, franja horaria, codigo de confirmacion y un boton para descargar la factura del deposito en PDF."},
+],
+tr:"La reserva MUD-A7K3F2 esta oficialmente CONFIRMADA. El operador debe ahora asignar vehiculo, conductor y cargadores para el dia del servicio, apoyandose en las recomendaciones de la inteligencia artificial."},
+
+{t:"Fase 5 — Asignacion de recursos con IA",d:"El operador asigna vehiculo y equipo guiado por las recomendaciones de Random Forest, y genera el plan de carga",
+s:[
+{a:"bo",l:"Operador",p:"Portal web",x:"Entra a su bandeja de reservas confirmadas. Ve la reserva MUD-A7K3F2 marcada como 'sin servicio asignado'. Pulsa 'Crear Servicio de Mudanza' para esta reserva."},
+{a:"bs",l:"Random Forest",p:"Backend Django",x:"Al crear el servicio, el backend ejecuta 3 modelos RF automaticamente. MODELO 1 — Recomendacion de contenedor: analiza el inventario completo (8 objetos, 2.16 m3, 250 kg, 2 objetos fragiles, 40% del peso en un solo objeto). Resultado: contenedor MEDIANO (15 m3, capacidad 3000 kg). MODELO 2 — Prediccion de viajes: con contenedor mediano y este inventario, ocupacion estimada 83%. Resultado: 1 viaje suficiente. MODELO 3 — Estimacion de tiempo: ruta Equipetrol-Plan 3000 (18 km), servicio estandar con embalaje, 8 objetos, sabado. Resultado: 195 minutos estimados. Almacena los tres resultados en el servicio de mudanza."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Ve la pantalla de asignacion con las recomendaciones de IA: 'Contenedor recomendado: MEDIANO (15 m3). Viajes previstos: 1. Tiempo estimado: 3h 15min.' Consulta la lista de vehiculos disponibles para el sabado 28 de marzo, filtrados por contenedor mediano o mayor."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Ve 3 vehiculos disponibles: (1) Camion placa 1234-ABC, mediano 15 m3, disponible. (2) Camion placa 5678-DEF, grande 25 m3, disponible. (3) Camion placa 9012-GHI, mediano 15 m3, en mantenimiento. Selecciona el camion 1234-ABC (mediano, coincide con la recomendacion de IA). Pulsa 'Asignar Vehiculo'."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Vincula el vehiculo 1234-ABC al servicio. Cambia el estado del vehiculo a EN_SERVICIO para el sabado 28. El vehiculo ya no aparece como disponible para otros servicios ese dia."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Consulta el personal disponible para el sabado 28. Ve la lista filtrada: Conductores disponibles: Juan Perez (calificacion 4.7, 45 servicios), Pedro Rojas (calificacion 4.3, 28 servicios). Cargadores disponibles: Carlos Lopez (4.5, 38 servicios), Mario Gutierrez (4.2, 22 servicios), Ana Torres (4.6, 31 servicios). Asigna a Juan Perez como conductor, Carlos Lopez como cargador principal y Mario Gutierrez como cargador de apoyo."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Crea 3 registros en asignacion_personal vinculados al servicio. Marca a Juan, Carlos y Mario como no disponibles para el sabado 28. El servicio pasa al estado ASIGNADO."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Pulsa 'Generar Plan de Carga' para que el sistema cree las instrucciones de acomodo basadas en la clasificacion de riesgo de cada objeto."},
+{a:"bs",l:"Sistema + IA",p:"Backend Django",x:"Ejecuta la heuristica de empaquetado usando la clasificacion RF de cada objeto. Genera el plan de carga ordenado: (1) Refrigerador LG — fondo inferior, embalaje especial obligatorio, riesgo ALTO. (2) Sofa 3 cuerpos — fondo, proteccion estandar, riesgo MEDIO. (3) Mesa de comedor — medio central, proteccion estandar, riesgo MEDIO. (4-8) 5 Cajas grandes — medio central apiladas, riesgo BAJO. (9) TV 55'' — frente superior, caja reforzada + burbuja, riesgo ALTO, ultimo en cargar y primero en descargar."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Almacena el plan en planes_carga con porcentaje_ocupacion = 83%, peso_total = 250 kg, instrucciones generales: 'Cargar objetos pesados al fondo. El refrigerador va primero con embalaje especial. La TV va al frente y arriba, es lo ultimo que se carga. No apilar nada sobre la TV. Verificar embalaje de objetos rojos (alto riesgo) antes de cargar.' Crea 9 registros en items_plan_carga con orden, posicion e instrucciones por objeto."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Envia notificacion push al conductor Juan Perez: 'Nuevo servicio asignado. Sabado 28 de marzo, 8:00 AM. Origen: Av. San Martin 456, Equipetrol. Destino: Calle 10 #789, Plan 3000. 8 objetos (2 alto riesgo). Vehiculo: 1234-ABC. Equipo: Carlos Lopez, Mario Gutierrez.' Envia notificaciones similares a Carlos y Mario."},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"Juan Perez recibe la notificacion push en su celular. Abre la app, ve el nuevo servicio en su lista de asignaciones. Puede consultar todos los detalles, el plan de carga y las instrucciones de IA desde ya para prepararse."},
+],
+tr:"El servicio esta completamente configurado: vehiculo asignado, equipo de 3 personas listo, plan de carga generado con instrucciones de IA. El conductor y los cargadores recibieron la notificacion en sus apps. Todo esta preparado para el dia de la mudanza."},
+
+{t:"Fase 6 — Ejecucion de la mudanza",d:"El dia del servicio: el conductor ejecuta paso a paso desde su app, el cliente sigue en tiempo real",
+s:[
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"Sabado 28 de marzo, 7:30 AM. Juan Perez abre la app e inicia sesion. Ve su servicio del dia en la pantalla principal. Pulsa para ver el detalle completo: datos del cliente, direccion de origen y destino, inventario con fotos de los 8 objetos, plan de carga con instrucciones de IA ordenadas, equipo asignado (Carlos y Mario). Revisa las instrucciones: 'Refrigerador primero al fondo con embalaje especial. TV al final, frente superior.'"},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"7:45 AM — Sale hacia Equipetrol. Pulsa el boton EN CAMINO. La app captura las coordenadas GPS (-17.7735, -63.1952). Pulsa el boton de navegacion que abre Google Maps con la direccion de origen precargada."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Registra el cambio de estado: asignado -> en_camino, hora 7:45 AM, GPS (-17.7735, -63.1952), cambiado por Juan Perez. Crea registro en historial_estado_servicio. Ejecuta tarea en segundo plano que envia notificacion push al cliente."},
+{a:"bc",l:"Cliente",p:"App movil cliente (push)",x:"Recibe push: 'Tu equipo de mudanza esta en camino. Conductor: Juan Perez. Vehiculo: camion mediano. Llegada estimada: 8:10 AM.' Abre la app y ve el timeline vertical: EN CAMINO resaltado en azul con hora 7:45 AM, los estados siguientes en gris."},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"8:05 AM — Llega a la direccion en Equipetrol. Pulsa EN ORIGEN. GPS: (-17.7680, -63.1890)."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Registra estado en_origen con hora y GPS. Push al cliente: 'El equipo llego a tu direccion. Hora: 8:05 AM.'"},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"8:15 AM — Comienza la carga. Pulsa CARGANDO. Abre el plan de carga en la app. Ve la lista ordenada: Item 1: Refrigerador LG, fondo inferior, badge ROJO, instruccion: 'Embalaje especial obligatorio antes de cargar. Verificar proteccion lateral.' Carlos y Mario embalan el refrigerador y lo suben al camion. Juan marca el checkbox: 'Refrigerador LG — CARGADO'. Progreso: 1/8."},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"Continua cargando en el orden del plan de IA. Item 2: Sofa al fondo, CARGADO (2/8). Item 3: Mesa al medio, CARGADO (3/8). Items 4-8: 5 Cajas apiladas al medio, CARGADAS (8/8 parcial — falta la TV). Item 9: TV 55'' al frente superior con caja reforzada + burbuja, CARGADO (8/8 objetos, 9/9 items con la TV)."},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"9:20 AM — Carga completada. La app muestra resumen: '8 objetos registrados, 8 cargados, 0 pendientes.' No hay discrepancias. Pulsa EN RUTA. La app abre navegacion GPS hacia Plan 3000."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Registra estado en_ruta con hora 9:20 AM y GPS. Push al cliente: 'Tus pertenencias estan en ruta hacia el destino. Hora de salida: 9:20 AM.'"},
+{a:"bc",l:"Cliente",p:"App movil cliente",x:"Recibe push. Abre la app: timeline muestra EN CAMINO (7:45), EN ORIGEN (8:05), CARGANDO (8:15), EN RUTA (9:20) todos en verde con hora. El estado actual EN RUTA esta resaltado y pulsando. Los estados restantes (en_destino, descargando, completado) siguen en gris."},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"10:00 AM — Llega a Plan 3000. Pulsa EN DESTINO. GPS: (-17.8120, -63.1450). Push al cliente: 'El equipo llego al destino. Hora: 10:00 AM.'"},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"10:10 AM — Comienza la descarga. Pulsa DESCARGANDO. Descarga en orden inverso al de carga (la TV sale primero porque esta al frente). Marca cada objeto como DESCARGADO: TV descargada, 5 cajas descargadas, mesa descargada, sofa descargado, refrigerador descargado."},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"11:15 AM — Descarga completada. Consulta resumen del checklist: '8 objetos registrados, 8 cargados, 8 descargados, 0 discrepancias.' Todo cuadra. Le pasa el celular al cliente para que firme en la pantalla tactil."},
+{a:"bc",l:"Cliente",p:"Celular del conductor",x:"El cliente firma con el dedo en la pantalla tactil del celular del conductor. La firma se captura como imagen PNG."},
+{a:"bd",l:"Conductor",p:"App movil conductor",x:"La app envía la firma al backend. Juan pulsa el boton COMPLETADO."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Registra el estado COMPLETADO con hora 11:20 AM y GPS. Calcula duracion real: inicio (en_camino 7:45) a fin (completado 11:20) = 3 horas 35 minutos (vs 3h 15min estimadas por IA, diferencia de +20min). Almacena la firma digital en confirmaciones_entrega. Registra viajes_reales = 1 (coincide con rf_viajes_predichos = 1). Push al cliente: 'Tu mudanza se completo exitosamente. Hora: 11:20 AM. Duracion: 3h 35min.'"},
+],
+tr:"El servicio de mudanza esta COMPLETADO. Los 8 objetos fueron cargados y descargados sin discrepancias en el checklist. La firma del cliente fue capturada desde el celular del conductor. Ahora el cliente debe confirmar la entrega desde su propia app, calificar el servicio y reportar cualquier incidencia."},
+
+{t:"Fase 7 — Confirmacion de entrega y calificacion",d:"El cliente confirma la recepcion, reporta incidencias si las hay, firma desde su app y califica al equipo",
+s:[
+{a:"bc",l:"Cliente",p:"App movil cliente (push)",x:"Recibe la push de servicio completado. La app activa automaticamente la pantalla de confirmacion de entrega. Muestra la lista de los 8 objetos con checkbox de verificacion. El cliente revisa uno por uno que todo llego correctamente."},
+{a:"bc",l:"Cliente",p:"App movil cliente",x:"Revisa los objetos: refrigerador OK, sofa OK, 5 cajas OK, TV OK. Pero nota que la mesa de comedor tiene un rayon de 10 cm en la superficie. Pulsa 'Reportar Incidencia' junto al objeto 'Mesa de comedor'."},
+{a:"bc",l:"Cliente",p:"App movil cliente (camara)",x:"Pantalla de reporte de incidencia: selecciona tipo 'Dano', toma foto del rayon desde la camara, describe el problema: 'Rayon de 10 cm en la superficie de la mesa de comedor.' Selecciona gravedad: Baja. Envia el reporte."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Crea registro en la tabla incidencias con servicio_id, objeto_id (mesa de comedor), tipo 'dano', foto del rayon, descripcion, gravedad 'baja', reportado_por = cliente, estado REPORTADA. Envia notificacion al operador: 'Nueva incidencia reportada en servicio MUD-A7K3F2. Objeto: Mesa de comedor. Tipo: Dano. Gravedad: Baja.'"},
+{a:"bc",l:"Cliente",p:"App movil cliente",x:"Firma digitalmente en la pantalla tactil de su propio celular. La firma se captura como imagen PNG diferente a la del conductor. Marca conformidad como PARCIAL (conforme excepto por la incidencia). Agrega observacion: 'Todo bien excepto el rayon en la mesa de comedor.'"},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Actualiza la confirmacion de entrega con la firma del cliente, cliente_conforme = parcial, observaciones registradas. Ahora hay dos firmas almacenadas: la del conductor (capturada en fase 6) y la del cliente."},
+{a:"bc",l:"Cliente",p:"App movil cliente",x:"La app presenta la pantalla de calificacion. Calificacion general: 4 de 5 estrellas. Puntualidad: 5 estrellas (llegaron a las 8:05, dentro de la franja 8-12). Cuidado de objetos: 3 estrellas (por el dano en la mesa). Atencion del equipo: 5 estrellas (amables y profesionales). Comentario: 'Puntuales y amables, pero hubo un pequeno dano en la mesa de comedor.' Envia la calificacion."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Registra la calificacion en calificaciones_servicio con las 4 subcalificaciones y el comentario. Actualiza automaticamente las metricas del personal: recalcula calificacion_promedio de Juan Perez (conductor), Carlos Lopez y Mario Gutierrez (cargadores) con esta nueva calificacion. Incrementa servicios_completados de los tres en +1. Incrementa cantidad_mudanzas del cliente en +1. Suma Bs 1,450 al monto_total_gastado del cliente."},
+],
+tr:"La entrega esta confirmada con doble firma (conductor + cliente). Se reporto una incidencia menor (rayon en la mesa). La calificacion del equipo fue registrada (4/5 general). El operador debe ahora resolver la incidencia, cobrar el saldo restante y generar la factura final."},
+
+{t:"Fase 8 — Cierre financiero, resolucion y retroalimentacion IA",d:"El operador cierra el ciclo completo: resuelve incidencias, cobra el saldo, genera factura. Los modelos RF aprenden de esta mudanza.",
+s:[
+{a:"bo",l:"Operador",p:"Portal web",x:"Ve el servicio completado en su panel. Abre el detalle completo: timeline de estados con GPS y horas, doble firma (conductor + cliente), inventario con 8 objetos verificados, calificacion 4/5, y 1 incidencia reportada con foto."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Abre la incidencia: tipo dano, objeto mesa de comedor, gravedad baja, foto del rayon de 10 cm. Contacta al cliente por telefono para ofrecer una solucion. Acuerdan un descuento de Bs 50 en el saldo pendiente como compensacion. Registra la comunicacion en el CRM: canal 'llamada', asunto 'Resolucion incidencia rayon mesa', contenido del acuerdo."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Cambia el estado de la incidencia de REPORTADA a RESUELTA. Registra la resolucion: 'Descuento de Bs 50 aplicado al saldo pendiente como compensacion por rayon en mesa de comedor. Cliente conforme con la solucion.' Fecha de resolucion: hoy."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Calcula el saldo pendiente: total Bs 1,450 - deposito Bs 145 - descuento Bs 50 = Bs 1,255 saldo a cobrar. El cliente paga en efectivo al conductor que lo habia recogido ese dia, o el operador lo registra ahora. Crea un nuevo pago: reserva MUD-A7K3F2, metodo 'efectivo', tipo 'saldo', monto Bs 1,255, estado COMPLETADO."},
+{a:"bo",l:"Operador",p:"Portal web",x:"Pulsa 'Generar Factura' para el pago del saldo. El sistema genera la factura final: FAC-2026-0002, subtotal Bs 1,110.62, IVA 13% = Bs 144.38, total Bs 1,255.00. El PDF se genera y queda disponible para descarga. El cliente tiene ahora 2 facturas: FAC-2026-0001 (deposito Bs 145) y FAC-2026-0002 (saldo Bs 1,255)."},
+{a:"bs",l:"Sistema",p:"Backend Django",x:"Envia notificacion al cliente: 'Pago de saldo registrado: Bs 1,255. Factura FAC-2026-0002 disponible para descarga. Gracias por usar nuestro servicio.' El ciclo de pagos esta completo: deposito + saldo = Bs 1,400 (Bs 1,450 - Bs 50 de descuento)."},
+{a:"bo",l:"Operador",p:"Portal web",x:"En el modulo CRM, la ficha del cliente se actualizo automaticamente: cantidad_mudanzas = 1, monto_total_gastado = Bs 1,400, ultima calificacion = 4/5. El operador crea una alerta de seguimiento: tipo 'seguimiento', titulo 'Contactar para segunda mudanza', fecha programada: 3 meses despues. Asi recordara ofrecer una promocion cuando se acerque la fecha."},
+{a:"bs",l:"Random Forest",p:"Backend (tarea en segundo plano)",x:"RETROALIMENTACION MODELO 1 — Precio: prediccion fue Bs 1,450, cobro real fue Bs 1,400 (con descuento por incidencia). Diferencia de 3.4%. Se incorpora al dataset para el proximo reentrenamiento semanal. RETROALIMENTACION MODELO 2 — Contenedor: contenedor mediano con 83% de ocupacion y 1 viaje real (coincide con prediccion). Dato positivo, confirma precision del modelo."},
+{a:"bs",l:"Random Forest",p:"Backend (tarea en segundo plano)",x:"RETROALIMENTACION MODELO 3 — Riesgo: la mesa de comedor fue clasificada como riesgo MEDIO (prob. 0.31) y sufrio dano real. Este dato refuerza los features de ese tipo de objeto. El refrigerador (riesgo ALTO) y la TV (riesgo ALTO) no sufrieron dano gracias a la proteccion especial aplicada. RETROALIMENTACION MODELO 4 — Tiempo: estimacion fue 195 min, duracion real fue 215 min. Diferencia de +20 min. Se incorpora para mejorar estimaciones futuras en la ruta Equipetrol-Plan 3000 en sabados."},
+{a:"bs",l:"Random Forest",p:"Backend (tarea programada semanal)",x:"RETROALIMENTACION MODELO 5 — Fidelizacion: actualiza el perfil del cliente con los datos de esta mudanza. Ejecuta prediccion: rf_probabilidad_retencion = 0.62, rf_segmento_predicho = 'ocasional'. El cliente tiene una probabilidad moderada de volver a contratar. El modelo considera: 1 mudanza realizada, calificacion 4/5 dada (satisfecho pero no totalmente), monto gastado Bs 1,400, 1 incidencia resuelta. RETROALIMENTACION MODELO 6 — Demanda: se registro 1 mudanza mas en la ruta Equipetrol -> Plan 3000, dia sabado, mes de marzo. En el proximo reentrenamiento mensual, el modelo ajusta la prediccion de demanda para esa combinacion zona/dia/mes."},
+{a:"ba",l:"Administrador",p:"Portal web",x:"En el dashboard de reportes, los KPIs se actualizaron automaticamente: mudanzas del mes +1, ingresos del mes +Bs 1,400, calificacion promedio del equipo recalculada, incidencias del mes +1 (resuelta). En el modulo de IA puede ver que el modelo de precio tiene un RMSE actual de Bs 85 y que el modelo de contenedor tiene accuracy de 91%. Si entrena una nueva version y las metricas mejoran, puede activarla para reemplazar la anterior."},
+],
+tr:"CICLO COMPLETO. La mudanza de Equipetrol a Plan 3000 se ejecuto en su totalidad: cotizacion con IA, reserva con deposito, asignacion inteligente de recursos, ejecucion con checklist y GPS, entrega con doble firma, incidencia resuelta con compensacion, pago total cobrado, 2 facturas generadas, calificacion registrada, CRM actualizado y 6 modelos de Random Forest retroalimentados con datos reales. El sistema esta listo para la siguiente mudanza con modelos mas precisos."},
+];
+let c=0;
+const n=document.getElementById('nav'),ps=document.getElementById('panels'),ct=document.getElementById('cnt');
+P.forEach((p,i)=>{
+const b=document.createElement('button');
+b.className='pb';
+b.textContent='Fase '+(i+1);
+b.onclick=()=>sh(i);
+n.appendChild(b);
+const d=document.createElement('div');
+d.className='pp';
+let h='<p class="pt">'+p.t+'</p><p class="pd">'+p.d+'</p>';
+p.s.forEach((s,j)=>{
+h+='<div class="ar"><span class="ab '+s.a+'">'+s.l+'</span><div class="ac">'+s.x+'<span class="ap">'+s.p+'</span></div></div>';
+if(j<p.s.length-1)h+='<div class="dw">\u2193</div>';
+});
+if(p.tr)h+='<div class="tr">'+p.tr+'</div>';
+d.innerHTML=h;
+ps.appendChild(d);
+});
+function sh(i){
+c=i;
+document.querySelectorAll('.pb').forEach((b,j)=>b.classList.toggle('on',j===i));
+document.querySelectorAll('.pp').forEach((p,j)=>p.classList.toggle('on',j===i));
+ct.textContent='Fase '+(i+1)+' de '+P.length;
+document.getElementById('pbtn').disabled=i===0;
+document.getElementById('nbtn').disabled=i===P.length-1;
+}
+function mv(d){sh(Math.max(0,Math.min(P.length-1,c+d)))}
+sh(0);
+</script>
